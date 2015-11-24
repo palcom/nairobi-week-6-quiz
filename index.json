@@ -1,0 +1,62 @@
+var http = require('http');
+var dispatch = require('dispatch');
+var querystring = require('querystring');
+
+// express
+var express = require('express');
+var app = express();
+
+// express middleware
+var bodyParser = require('body-parser');
+
+
+// include mongoose	
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/nairobi-week-6-quiz'); 
+
+// define our schema
+var contactschema = mongoose.Schema({
+	name: String,
+	id: Number,
+	body:String,
+	email:String
+
+})
+
+// compile our model
+var contacts = mongoose.model('contacts', contactsSchema);
+
+
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.get('/contacts', function(req, res){
+	contacts.find(function(err, contacts){
+		if (err) {
+			console.log(err);
+		}else{
+			res.json(contacts);
+		}
+	});
+});
+
+
+app.post('/contacts/new', function(req, res) {
+	console.log(req.body);
+	formData = req.body;
+
+	var contacts = new contacts(formData);
+	contacts.save(function(err, contacts) {
+		if (err) {
+			console.log(err);
+		} else { 
+			console.log('Successfully saved the contacts');
+			res.redirect('/contacts');
+		}
+	});
+});
+
+
+
+app.listen(9090, function(){
+	console.log('Server running on http://127.0.0.1:9090');
